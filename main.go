@@ -48,13 +48,18 @@ type spineItemRef struct {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintf(os.Stderr, "Usage: %s <file.epub>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Usage: %s <file.epub> [file2.epub ...]\n", os.Args[0])
 		os.Exit(1)
 	}
-	epubPath := os.Args[1]
 
-	if err := convert(epubPath); err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+	hasError := false
+	for _, epubPath := range os.Args[1:] {
+		if err := convert(epubPath); err != nil {
+			fmt.Fprintf(os.Stderr, "Error: %s: %v\n", epubPath, err)
+			hasError = true
+		}
+	}
+	if hasError {
 		os.Exit(1)
 	}
 }

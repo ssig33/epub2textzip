@@ -17,6 +17,7 @@ go install github.com/ssig33/epub2textzip@latest
 
 ```
 epub2textzip input.epub
+epub2textzip book1.epub book2.epub book3.epub
 ```
 
-Produces `input.zip`.
+Each input `*.epub` produces a corresponding `*.zip`.
