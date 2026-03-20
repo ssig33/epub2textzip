@@ -221,7 +221,7 @@ func extractText(f *zip.File, opfDir, filePath string) (string, []string, error)
 				return
 			}
 		case html.TextNode:
-			text := strings.TrimSpace(n.Data)
+			text := strings.Trim(n.Data, " \t\n\r")
 			if text != "" {
 				b.WriteString(text)
 			}
