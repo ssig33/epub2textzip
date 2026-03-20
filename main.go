@@ -146,7 +146,8 @@ func convert(epubPath string) error {
 	defer w.Close()
 
 	// Write text file
-	tw, err := w.Create("content.txt")
+	baseName := strings.TrimSuffix(filepath.Base(epubPath), filepath.Ext(epubPath))
+	tw, err := w.Create(baseName + ".txt")
 	if err != nil {
 		return err
 	}
