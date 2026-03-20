@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -92,7 +93,10 @@ func rename(epubPath string) error {
 
 	// Sanitize for filename
 	title = sanitize(title)
-	author = strings.ReplaceAll(sanitize(author), " ", "")
+	author = sanitize(author)
+	if !isASCIIAlnum(author) {
+		author = strings.ReplaceAll(author, " ", "")
+	}
 
 	var newName string
 	if author != "" {
@@ -131,6 +135,12 @@ func sanitize(s string) string {
 		"|", "\uff5c",
 	)
 	return replacer.Replace(s)
+}
+
+var asciiAlnumRe = regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)
+
+func isASCIIAlnum(s string) bool {
+	return asciiAlnumRe.MatchString(s)
 }
 
 func readXML(f *zip.File, v interface{}) error {
