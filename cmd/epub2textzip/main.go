@@ -214,6 +214,17 @@ func extractText(f *zip.File, opfDir, filePath string) (string, []string, error)
 				}
 			case "br":
 				b.WriteString("\n")
+			case "ruby":
+				base, rt := extractRuby(n)
+				if rt != "" {
+					b.WriteString(base + "\u300a" + rt + "\u300b")
+				} else {
+					b.WriteString(base)
+				}
+				return
+			case "rt", "rp":
+				// handled by ruby case
+				return
 			case "p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "blockquote", "tr":
 				for c := n.FirstChild; c != nil; c = c.NextSibling {
 					walk(c)
@@ -256,6 +267,34 @@ func extractText(f *zip.File, opfDir, filePath string) (string, []string, error)
 	}
 
 	return b.String(), images, nil
+}
+
+func extractRuby(n *html.Node) (string, string) {
+	var base, rt strings.Builder
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.TextNode {
+			base.WriteString(strings.Trim(c.Data, " \t\n\r"))
+		} else if c.Type == html.ElementNode {
+			switch c.Data {
+			case "rt":
+				for tc := c.FirstChild; tc != nil; tc = tc.NextSibling {
+					if tc.Type == html.TextNode {
+						rt.WriteString(strings.Trim(tc.Data, " \t\n\r"))
+					}
+				}
+			case "rp":
+				// skip
+			default:
+				// rb or other inline elements
+				for tc := c.FirstChild; tc != nil; tc = tc.NextSibling {
+					if tc.Type == html.TextNode {
+						base.WriteString(strings.Trim(tc.Data, " \t\n\r"))
+					}
+				}
+			}
+		}
+	}
+	return base.String(), rt.String()
 }
 
 func getAttr(n *html.Node, key string) string {
