@@ -92,7 +92,7 @@ func rename(epubPath string) error {
 
 	// Sanitize for filename
 	title = sanitize(title)
-	author = sanitize(author)
+	author = strings.ReplaceAll(sanitize(author), " ", "")
 
 	var newName string
 	if author != "" {
